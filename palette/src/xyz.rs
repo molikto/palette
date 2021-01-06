@@ -15,8 +15,8 @@ use crate::matrix::{multiply_rgb_to_xyz, rgb_to_xyz_matrix};
 use crate::rgb::{Rgb, RgbSpace, RgbStandard};
 use crate::white_point::{WhitePoint, D65};
 use crate::{
-    clamp, contrast_ratio, from_f64, Alpha, Component, ComponentWise, FloatComponent, Lab, Limited,
-    Luma, Mix, Pixel, RelativeContrast, Shade, Yxy,
+    clamp, contrast_ratio, from_f64, oklab, Alpha, Component, ComponentWise, FloatComponent, Lab,
+    Limited, Luma, Mix, Oklab, Pixel, RelativeContrast, Shade, Yxy,
 };
 
 /// CIE 1931 XYZ with an alpha component. See the [`Xyza` implementation in
@@ -38,7 +38,7 @@ pub type Xyza<Wp = D65, T = f32> = Alpha<Xyz<Wp, T>, T>;
     palette_internal,
     white_point = "Wp",
     component = "T",
-    skip_derives(Xyz, Yxy, Rgb, Lab, Luma)
+    skip_derives(Xyz, Yxy, Rgb, Lab, Oklab, Luma)
 )]
 #[repr(C)]
 pub struct Xyz<Wp = D65, T = f32>
@@ -264,6 +264,44 @@ where
         }
 
         Xyz::with_wp(convert(x), convert(y), convert(z)) * Wp::get_xyz()
+    }
+}
+
+impl<Wp, T> FromColorUnclamped<Oklab<Wp, T>> for Xyz<Wp, T>
+where
+    Wp: WhitePoint,
+    T: FloatComponent,
+{
+    fn from_color_unclamped(color: Oklab<Wp, T>) -> Self {
+        let l_ = from_f64::<T>(oklab::M2_INV[0][0]) * color.l
+            + from_f64::<T>(oklab::M2_INV[0][1]) * color.a
+            + from_f64::<T>(oklab::M2_INV[0][2]) * color.b;
+
+        let m_ = from_f64::<T>(oklab::M2_INV[1][0]) * color.l
+            + from_f64::<T>(oklab::M2_INV[1][1]) * color.a
+            + from_f64::<T>(oklab::M2_INV[1][2]) * color.b;
+
+        let s_ = from_f64::<T>(oklab::M2_INV[2][0]) * color.l
+            + from_f64::<T>(oklab::M2_INV[2][1]) * color.a
+            + from_f64::<T>(oklab::M2_INV[2][2]) * color.b;
+
+        let l = l_.powi(3);
+        let m = m_.powi(3);
+        let s = s_.powi(3);
+
+        let x = from_f64::<T>(oklab::M1_INV[0][0]) * l
+            + from_f64::<T>(oklab::M1_INV[0][1]) * m
+            + from_f64::<T>(oklab::M1_INV[0][2]) * s;
+
+        let y = from_f64::<T>(oklab::M1_INV[1][0]) * l
+            + from_f64::<T>(oklab::M1_INV[1][1]) * m
+            + from_f64::<T>(oklab::M1_INV[1][2]) * s;
+
+        let z = from_f64::<T>(oklab::M1_INV[2][0]) * l
+            + from_f64::<T>(oklab::M1_INV[2][1]) * m
+            + from_f64::<T>(oklab::M1_INV[2][2]) * s;
+
+        Self::with_wp(x, y, z)
     }
 }
 

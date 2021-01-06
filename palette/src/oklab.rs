@@ -1,5 +1,5 @@
+use core::marker::PhantomData;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
-use std::marker::PhantomData;
 
 #[cfg(feature = "random")]
 use rand::distributions::uniform::{SampleBorrow, SampleUniform, Uniform, UniformSampler};
@@ -632,11 +632,11 @@ where
     where
         Wp: WhitePoint,
     {
-        Oklab {
-            l: rng.gen() * from_f64(1.0),
-            a: rng.gen() * from_f64(2.0) - from_f64(1.0),
-            b: rng.gen() * from_f64(2.0) - from_f64(1.0),
-        }
+        Oklab::new(
+            rng.gen() * from_f64(1.0),
+            rng.gen() * from_f64(2.0) - from_f64(1.0),
+            rng.gen() * from_f64(2.0) - from_f64(1.0),
+        )
     }
 }
 
@@ -705,11 +705,7 @@ where
     where
         Wp: WhitePoint,
     {
-        Oklab {
-            l: self.l.sample(rng),
-            a: self.a.sample(rng),
-            b: self.b.sample(rng),
-        }
+        Oklab::new(self.l.sample(rng), self.a.sample(rng), self.b.sample(rng))
     }
 }
 
@@ -755,18 +751,18 @@ mod test {
 
     #[test]
     fn check_min_max_components() {
-        assert_relative_eq!(Oklab::<D65, f32>::min_l(), 0.0);
-        assert_relative_eq!(Oklab::<D65, f32>::min_a(), -1.0);
-        assert_relative_eq!(Oklab::<D65, f32>::min_b(), -1.0);
-        assert_relative_eq!(Oklab::<D65, f32>::max_l(), 1.0);
-        assert_relative_eq!(Oklab::<D65, f32>::max_a(), 1.0);
-        assert_relative_eq!(Oklab::<D65, f32>::max_b(), 1.0);
+        assert_relative_eq!(Oklab::<D65>::min_l(), 0.0);
+        assert_relative_eq!(Oklab::<D65>::min_a(), -1.0);
+        assert_relative_eq!(Oklab::<D65>::min_b(), -1.0);
+        assert_relative_eq!(Oklab::<D65>::max_l(), 1.0);
+        assert_relative_eq!(Oklab::<D65>::max_a(), 1.0);
+        assert_relative_eq!(Oklab::<D65>::max_b(), 1.0);
     }
 
     #[cfg(feature = "serializing")]
     #[test]
     fn serialize() {
-        let serialized = ::serde_json::to_string(&Oklab::new(0.3, 0.8, 0.1)).unwrap();
+        let serialized = ::serde_json::to_string(&Oklab::<D65>::new(0.3, 0.8, 0.1)).unwrap();
 
         assert_eq!(serialized, r#"{"l":0.3,"a":0.8,"b":0.1}"#);
     }
@@ -781,12 +777,12 @@ mod test {
 
     #[cfg(feature = "random")]
     test_uniform_distribution! {
-        Oklab<f32> {
+        Oklab {
             l: (0.0, 1.0),
             a: (-1.0, 1.0),
             b: (-1.0, 1.0)
         },
-        min: Oklab::new(0.0f32, -1.0, -1.0),
+        min: Oklab::new(0.0, -1.0, -1.0),
         max: Oklab::new(1.0, 1.0, 1.0)
     }
 }

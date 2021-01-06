@@ -12,35 +12,48 @@ use crate::color_difference::ColorDifference;
 use crate::color_difference::{get_ciede_difference, LabColorDiff};
 use crate::convert::FromColorUnclamped;
 use crate::encoding::pixel::RawPixel;
+use crate::matrix::multiply_xyz;
 use crate::white_point::{WhitePoint, D65};
 use crate::{
     clamp, contrast_ratio, from_f64, Alpha, Component, ComponentWise, FloatComponent, GetHue,
-    Limited, Mix, OklabHue, Pixel, RelativeContrast, Shade, Xyz,
+    Limited, Mat3, Mix, OklabHue, Pixel, RelativeContrast, Shade, Xyz,
 };
 
-const M1: [[f64; 3]; 3] = [
-    [0.8189330101, 0.3618667424, -0.1288597137],
-    [0.0329845436, 0.9293118715, 0.0361456387],
-    [0.0482003018, 0.2643662691, 0.6338517070],
-];
+#[rustfmt::skip]
+fn m1<T: FloatComponent>() -> Mat3<T> {
+    [
+        from_f64(0.8189330101), from_f64(0.3618667424), from_f64(-0.1288597137),
+        from_f64(0.0329845436), from_f64(0.9293118715), from_f64(0.0361456387),
+        from_f64(0.0482003018), from_f64(0.2643662691), from_f64(0.6338517070),
+    ]
+}
 
-pub(crate) const M1_INV: [[f64; 3]; 3] = [
-    [1.2270138511, -0.5577999807, 0.2812561490],
-    [-0.0405801784, 1.1122568696, -0.0716766787],
-    [-0.0763812845, -0.4214819784, 1.5861632204],
-];
+#[rustfmt::skip]
+pub(crate) fn m1_inv<T: FloatComponent>() -> Mat3<T> {
+    [
+        from_f64(1.2270138511), from_f64(-0.5577999807), from_f64(0.2812561490),
+        from_f64(-0.0405801784), from_f64(1.1122568696), from_f64(-0.0716766787),
+        from_f64(-0.0763812845), from_f64(-0.4214819784), from_f64(1.5861632204),
+    ]
+}
 
-const M2: [[f64; 3]; 3] = [
-    [0.2104542553, 0.7936177850, -0.0040720468],
-    [1.9779984951, -2.4285922050, 0.4505937099],
-    [0.0259040371, 0.7827717662, -0.8086757660],
-];
+#[rustfmt::skip]
+fn m2<T: FloatComponent>() -> Mat3<T> {
+    [
+        from_f64(0.2104542553), from_f64(0.7936177850), from_f64(-0.0040720468),
+        from_f64(1.9779984951), from_f64(-2.4285922050), from_f64(0.4505937099),
+        from_f64(0.0259040371), from_f64(0.7827717662), from_f64(-0.8086757660),
+    ]
+}
 
-pub(crate) const M2_INV: [[f64; 3]; 3] = [
-    [0.9999999985, 0.3963377922, 0.2158037581],
-    [1.0000000089, -0.1055613423, -0.0638541748],
-    [1.0000000547, -0.0894841821, -1.2914855379],
-];
+#[rustfmt::skip]
+pub(crate) fn m2_inv<T: FloatComponent>() -> Mat3<T> {
+    [
+        from_f64(0.9999999985), from_f64(0.3963377922), from_f64(0.2158037581),
+        from_f64(1.0000000089), from_f64(-0.1055613423), from_f64(-0.0638541748),
+        from_f64(1.0000000547), from_f64(-0.0894841821), from_f64(-1.2914855379),
+    ]
+}
 
 /// Oklab with an alpha component. See the [`Oklaba` implementation in
 /// `Alpha`](crate::Alpha#Oklaba).
@@ -198,33 +211,18 @@ where
     T: FloatComponent,
 {
     fn from_color_unclamped(color: Xyz<Wp, T>) -> Self {
-        let l = from_f64::<T>(M1[0][0]) * color.x
-            + from_f64::<T>(M1[0][1]) * color.y
-            + from_f64::<T>(M1[0][2]) * color.z;
+        let m1 = m1();
+        let m2 = m2();
 
-        let m = from_f64::<T>(M1[1][0]) * color.x
-            + from_f64::<T>(M1[1][1]) * color.y
-            + from_f64::<T>(M1[1][2]) * color.z;
+        let Xyz {
+            x: l, y: m, z: s, ..
+        } = multiply_xyz::<_, Wp, _>(&m1, &color);
 
-        let s = from_f64::<T>(M1[2][0]) * color.x
-            + from_f64::<T>(M1[2][1]) * color.y
-            + from_f64::<T>(M1[2][2]) * color.z;
+        let l_m_s_ = Xyz::new(l.cbrt(), m.cbrt(), s.cbrt());
 
-        let l_ = l.cbrt();
-        let m_ = m.cbrt();
-        let s_ = s.cbrt();
-
-        let l = from_f64::<T>(M2[0][0]) * l_
-            + from_f64::<T>(M2[0][1]) * m_
-            + from_f64::<T>(M2[0][2]) * s_;
-
-        let a = from_f64::<T>(M2[1][0]) * l_
-            + from_f64::<T>(M2[1][1]) * m_
-            + from_f64::<T>(M2[1][2]) * s_;
-
-        let b = from_f64::<T>(M2[2][0]) * l_
-            + from_f64::<T>(M2[2][1]) * m_
-            + from_f64::<T>(M2[2][2]) * s_;
+        let Xyz {
+            x: l, y: a, z: b, ..
+        } = multiply_xyz::<_, Wp, _>(&m2, &l_m_s_);
 
         Self::new(l, a, b)
     }

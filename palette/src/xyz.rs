@@ -11,7 +11,7 @@ use rand::Rng;
 use crate::convert::FromColorUnclamped;
 use crate::encoding::pixel::RawPixel;
 use crate::luma::LumaStandard;
-use crate::matrix::{multiply_rgb_to_xyz, rgb_to_xyz_matrix};
+use crate::matrix::{multiply_rgb_to_xyz, multiply_xyz, rgb_to_xyz_matrix};
 use crate::rgb::{Rgb, RgbSpace, RgbStandard};
 use crate::white_point::{WhitePoint, D65};
 use crate::{
@@ -273,33 +273,19 @@ where
     T: FloatComponent,
 {
     fn from_color_unclamped(color: Oklab<Wp, T>) -> Self {
-        let l_ = from_f64::<T>(oklab::M2_INV[0][0]) * color.l
-            + from_f64::<T>(oklab::M2_INV[0][1]) * color.a
-            + from_f64::<T>(oklab::M2_INV[0][2]) * color.b;
+        let m1_inv = oklab::m1_inv();
+        let m2_inv = oklab::m2_inv();
 
-        let m_ = from_f64::<T>(oklab::M2_INV[1][0]) * color.l
-            + from_f64::<T>(oklab::M2_INV[1][1]) * color.a
-            + from_f64::<T>(oklab::M2_INV[1][2]) * color.b;
+        let Xyz {
+            x: l_,
+            y: m_,
+            z: s_,
+            ..
+        } = multiply_xyz::<_, Wp, _>(&m2_inv, &Xyz::new(color.l, color.a, color.b));
 
-        let s_ = from_f64::<T>(oklab::M2_INV[2][0]) * color.l
-            + from_f64::<T>(oklab::M2_INV[2][1]) * color.a
-            + from_f64::<T>(oklab::M2_INV[2][2]) * color.b;
+        let lms = Xyz::new(l_.powi(3), m_.powi(3), s_.powi(3));
 
-        let l = l_.powi(3);
-        let m = m_.powi(3);
-        let s = s_.powi(3);
-
-        let x = from_f64::<T>(oklab::M1_INV[0][0]) * l
-            + from_f64::<T>(oklab::M1_INV[0][1]) * m
-            + from_f64::<T>(oklab::M1_INV[0][2]) * s;
-
-        let y = from_f64::<T>(oklab::M1_INV[1][0]) * l
-            + from_f64::<T>(oklab::M1_INV[1][1]) * m
-            + from_f64::<T>(oklab::M1_INV[1][2]) * s;
-
-        let z = from_f64::<T>(oklab::M1_INV[2][0]) * l
-            + from_f64::<T>(oklab::M1_INV[2][1]) * m
-            + from_f64::<T>(oklab::M1_INV[2][2]) * s;
+        let Xyz { x, y, z, .. } = multiply_xyz::<_, Wp, _>(&m1_inv, &lms);
 
         Self::with_wp(x, y, z)
     }

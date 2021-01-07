@@ -242,13 +242,13 @@ where
 
         let Xyz {
             x: l, y: m, z: s, ..
-        } = multiply_xyz(&m1, &color);
+        } = multiply_xyz::<_, D65, _>(&m1, &color);
 
         let l_m_s_ = Xyz::new(l.cbrt(), m.cbrt(), s.cbrt());
 
         let Xyz {
             x: l, y: a, z: b, ..
-        } = multiply_xyz(&m2, &l_m_s_);
+        } = multiply_xyz::<_, D65, _>(&m2, &l_m_s_);
 
         Self::new(l, a, b)
     }
@@ -718,7 +718,7 @@ mod test {
     #[test]
     fn ranges() {
         assert_ranges! {
-            Oklab<D65, f64>;
+            Oklab<f64>;
             limited {
                 l: 0.0 => 1.0,
                 a: -1.0 => 1.0,
@@ -731,12 +731,12 @@ mod test {
 
     #[test]
     fn check_min_max_components() {
-        assert_relative_eq!(Oklab::<D65>::min_l(), 0.0);
-        assert_relative_eq!(Oklab::<D65>::min_a(), -1.0);
-        assert_relative_eq!(Oklab::<D65>::min_b(), -1.0);
-        assert_relative_eq!(Oklab::<D65>::max_l(), 1.0);
-        assert_relative_eq!(Oklab::<D65>::max_a(), 1.0);
-        assert_relative_eq!(Oklab::<D65>::max_b(), 1.0);
+        assert_relative_eq!(Oklab::<f32>::min_l(), 0.0);
+        assert_relative_eq!(Oklab::<f32>::min_a(), -1.0);
+        assert_relative_eq!(Oklab::<f32>::min_b(), -1.0);
+        assert_relative_eq!(Oklab::<f32>::max_l(), 1.0);
+        assert_relative_eq!(Oklab::<f32>::max_a(), 1.0);
+        assert_relative_eq!(Oklab::<f32>::max_b(), 1.0);
     }
 
     #[cfg(feature = "serializing")]

@@ -280,10 +280,10 @@ where
             y: m_,
             z: s_,
             ..
-        } = multiply_xyz(&m2_inv, &Xyz::new(color.l, color.a, color.b));
+        } = multiply_xyz::<_, D65, _>(&m2_inv, &Xyz::new(color.l, color.a, color.b));
 
         let lms = Xyz::new(l_.powi(3), m_.powi(3), s_.powi(3));
-        let Xyz { x, y, z, .. } = multiply_xyz(&m1_inv, &lms);
+        let Xyz { x, y, z, .. } = multiply_xyz::<_, D65, _>(&m1_inv, &lms);
 
         Self::with_wp(x, y, z)
     }

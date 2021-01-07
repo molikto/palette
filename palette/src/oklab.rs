@@ -631,7 +631,7 @@ where
         Wp: WhitePoint,
     {
         Oklab::new(
-            rng.gen() * from_f64(1.0),
+            rng.gen(),
             rng.gen() * from_f64(2.0) - from_f64(1.0),
             rng.gen() * from_f64(2.0) - from_f64(1.0),
         )

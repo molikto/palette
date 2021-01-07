@@ -1,4 +1,3 @@
-use core::marker::PhantomData;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
 #[cfg(feature = "random")]
@@ -13,7 +12,7 @@ use crate::color_difference::{get_ciede_difference, LabColorDiff};
 use crate::convert::FromColorUnclamped;
 use crate::encoding::pixel::RawPixel;
 use crate::matrix::multiply_xyz;
-use crate::white_point::{WhitePoint, D65};
+use crate::white_point::D65;
 use crate::{
     clamp, contrast_ratio, from_f64, Alpha, Component, ComponentWise, FloatComponent, GetHue,
     Limited, Mat3, Mix, OklabHue, Pixel, RelativeContrast, Shade, Xyz,
@@ -57,27 +56,25 @@ pub(crate) fn m2_inv<T: FloatComponent>() -> Mat3<T> {
 
 /// Oklab with an alpha component. See the [`Oklaba` implementation in
 /// `Alpha`](crate::Alpha#Oklaba).
-pub type Oklaba<Wp = D65, T = f32> = Alpha<Oklab<Wp, T>, T>;
+pub type Oklaba<T = f32> = Alpha<Oklab<T>, T>;
 
 /// The [Oklab color space](https://bottosson.github.io/posts/oklab/).
 ///
 /// Oklab is a perceptually-uniform color space similar in structure to [L\*a\*b\*](crate::Lab), but
 /// with better perceptual uniformity. It assumes a D65 whitepoint and normal well-lit viewing
-/// conditions. As such, **the `Wp` type parameter is ignored** and is only present due to
-/// complications with `FromColorUnclamped`.
+/// conditions.
 #[derive(Debug, PartialEq, Pixel, FromColorUnclamped, WithAlpha)]
 #[cfg_attr(feature = "serializing", derive(Serialize, Deserialize))]
 #[palette(
     palette_internal,
-    white_point = "Wp",
+    white_point = "D65",
     component = "T",
     skip_derives(Oklab, Xyz)
 )]
 #[repr(C)]
-pub struct Oklab<Wp = D65, T = f32>
+pub struct Oklab<T = f32>
 where
     T: FloatComponent,
-    Wp: WhitePoint,
 {
     /// L is the lightness of the color. 0 gives absolute black and 1 gives the brightest white.
     pub l: T,
@@ -87,44 +84,26 @@ where
 
     /// b goes from yellow at -1 to blue at 1.
     pub b: T,
-
-    /// The white point associated with the color's illuminant and observer.
-    /// D65 for 2 degree observer is used by default.
-    #[cfg_attr(feature = "serializing", serde(skip))]
-    #[palette(unsafe_zero_sized)]
-    pub white_point: PhantomData<Wp>,
 }
 
-impl<Wp, T> Copy for Oklab<Wp, T>
-where
-    T: FloatComponent,
-    Wp: WhitePoint,
-{
-}
+impl<T> Copy for Oklab<T> where T: FloatComponent {}
 
-impl<Wp, T> Clone for Oklab<Wp, T>
+impl<T> Clone for Oklab<T>
 where
     T: FloatComponent,
-    Wp: WhitePoint,
 {
-    fn clone(&self) -> Oklab<Wp, T> {
+    fn clone(&self) -> Oklab<T> {
         *self
     }
 }
 
-impl<Wp, T> Oklab<Wp, T>
+impl<T> Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
 {
     /// Create an Oklab color.
     pub fn new(l: T, a: T, b: T) -> Self {
-        Self {
-            l,
-            a,
-            b,
-            white_point: PhantomData,
-        }
+        Self { l, a, b }
     }
 
     /// Convert to a `(L, a, b)` tuple.
@@ -169,9 +148,8 @@ where
 }
 
 ///<span id="Oklaba"></span>[`Oklaba`](crate::Oklaba) implementations.
-impl<Wp, T, A> Alpha<Oklab<Wp, T>, A>
+impl<T, A> Alpha<Oklab<T>, A>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
     A: Component,
 {
@@ -194,9 +172,8 @@ where
     }
 }
 
-impl<Wp, T> FromColorUnclamped<Oklab<Wp, T>> for Oklab<Wp, T>
+impl<T> FromColorUnclamped<Oklab<T>> for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
 {
     fn from_color_unclamped(color: Self) -> Self {
@@ -204,67 +181,54 @@ where
     }
 }
 
-/// This implementation is **only valid if the XYZ white point is D65**.
-impl<Wp, T> FromColorUnclamped<Xyz<Wp, T>> for Oklab<Wp, T>
+impl<T> FromColorUnclamped<Xyz<D65, T>> for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
 {
-    fn from_color_unclamped(color: Xyz<Wp, T>) -> Self {
+    fn from_color_unclamped(color: Xyz<D65, T>) -> Self {
         let m1 = m1();
         let m2 = m2();
 
         let Xyz {
             x: l, y: m, z: s, ..
-        } = multiply_xyz::<_, Wp, _>(&m1, &color);
+        } = multiply_xyz(&m1, &color);
 
         let l_m_s_ = Xyz::new(l.cbrt(), m.cbrt(), s.cbrt());
 
         let Xyz {
             x: l, y: a, z: b, ..
-        } = multiply_xyz::<_, Wp, _>(&m2, &l_m_s_);
+        } = multiply_xyz(&m2, &l_m_s_);
 
         Self::new(l, a, b)
     }
 }
 
-impl<Wp, T: FloatComponent> From<(T, T, T)> for Oklab<Wp, T>
-where
-    Wp: WhitePoint,
-{
+impl<T: FloatComponent> From<(T, T, T)> for Oklab<T> {
     fn from(components: (T, T, T)) -> Self {
         Self::from_components(components)
     }
 }
 
-impl<Wp, T: FloatComponent> Into<(T, T, T)> for Oklab<Wp, T>
-where
-    Wp: WhitePoint,
-{
+impl<T: FloatComponent> Into<(T, T, T)> for Oklab<T> {
     fn into(self) -> (T, T, T) {
         self.into_components()
     }
 }
 
-impl<Wp: WhitePoint, T: FloatComponent, A: Component> From<(T, T, T, A)>
-    for Alpha<Oklab<Wp, T>, A>
-{
+impl<T: FloatComponent, A: Component> From<(T, T, T, A)> for Alpha<Oklab<T>, A> {
     fn from(components: (T, T, T, A)) -> Self {
         Self::from_components(components)
     }
 }
 
-impl<Wp: WhitePoint, T: FloatComponent, A: Component> Into<(T, T, T, A)>
-    for Alpha<Oklab<Wp, T>, A>
-{
+impl<T: FloatComponent, A: Component> Into<(T, T, T, A)> for Alpha<Oklab<T>, A> {
     fn into(self) -> (T, T, T, A) {
         self.into_components()
     }
 }
 
-impl<Wp, T> Limited for Oklab<Wp, T>
+impl<T> Limited for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
 {
     #[rustfmt::skip]
@@ -287,9 +251,8 @@ where
     }
 }
 
-impl<Wp, T> Mix for Oklab<Wp, T>
+impl<T> Mix for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
 {
     type Scalar = T;
@@ -305,9 +268,8 @@ where
     }
 }
 
-impl<Wp, T> Shade for Oklab<Wp, T>
+impl<T> Shade for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
 {
     type Scalar = T;
@@ -317,9 +279,8 @@ where
     }
 }
 
-impl<Wp, T> GetHue for Oklab<Wp, T>
+impl<T> GetHue for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
 {
     type Hue = OklabHue<T>;
@@ -333,9 +294,8 @@ where
     }
 }
 
-impl<Wp, T> ColorDifference for Oklab<Wp, T>
+impl<T> ColorDifference for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
 {
     type Scalar = T;
@@ -361,9 +321,8 @@ where
     }
 }
 
-impl<Wp, T> ComponentWise for Oklab<Wp, T>
+impl<T> ComponentWise for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
 {
     type Scalar = T;
@@ -377,9 +336,8 @@ where
     }
 }
 
-impl<Wp, T> Default for Oklab<Wp, T>
+impl<T> Default for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
 {
     fn default() -> Self {
@@ -387,9 +345,8 @@ where
     }
 }
 
-impl<Wp, T> Add for Oklab<Wp, T>
+impl<T> Add for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
 {
     type Output = Self;
@@ -399,9 +356,8 @@ where
     }
 }
 
-impl<Wp, T> Add<T> for Oklab<Wp, T>
+impl<T> Add<T> for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
 {
     type Output = Self;
@@ -411,9 +367,8 @@ where
     }
 }
 
-impl<Wp, T> AddAssign for Oklab<Wp, T>
+impl<T> AddAssign for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent + AddAssign,
 {
     fn add_assign(&mut self, other: Self) {
@@ -423,9 +378,8 @@ where
     }
 }
 
-impl<Wp, T> AddAssign<T> for Oklab<Wp, T>
+impl<T> AddAssign<T> for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent + AddAssign,
 {
     fn add_assign(&mut self, c: T) {
@@ -435,9 +389,8 @@ where
     }
 }
 
-impl<Wp, T> Sub for Oklab<Wp, T>
+impl<T> Sub for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
 {
     type Output = Self;
@@ -447,9 +400,8 @@ where
     }
 }
 
-impl<Wp, T> Sub<T> for Oklab<Wp, T>
+impl<T> Sub<T> for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
 {
     type Output = Self;
@@ -459,9 +411,8 @@ where
     }
 }
 
-impl<Wp, T> SubAssign for Oklab<Wp, T>
+impl<T> SubAssign for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent + SubAssign,
 {
     fn sub_assign(&mut self, other: Self) {
@@ -471,9 +422,8 @@ where
     }
 }
 
-impl<Wp, T> SubAssign<T> for Oklab<Wp, T>
+impl<T> SubAssign<T> for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent + SubAssign,
 {
     fn sub_assign(&mut self, c: T) {
@@ -483,9 +433,8 @@ where
     }
 }
 
-impl<Wp, T> Mul for Oklab<Wp, T>
+impl<T> Mul for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
 {
     type Output = Self;
@@ -495,9 +444,8 @@ where
     }
 }
 
-impl<Wp, T> Mul<T> for Oklab<Wp, T>
+impl<T> Mul<T> for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
 {
     type Output = Self;
@@ -507,9 +455,8 @@ where
     }
 }
 
-impl<Wp, T> MulAssign for Oklab<Wp, T>
+impl<T> MulAssign for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent + MulAssign,
 {
     fn mul_assign(&mut self, other: Self) {
@@ -519,9 +466,8 @@ where
     }
 }
 
-impl<Wp, T> MulAssign<T> for Oklab<Wp, T>
+impl<T> MulAssign<T> for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent + MulAssign,
 {
     fn mul_assign(&mut self, c: T) {
@@ -531,9 +477,8 @@ where
     }
 }
 
-impl<Wp, T> Div for Oklab<Wp, T>
+impl<T> Div for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
 {
     type Output = Self;
@@ -543,9 +488,8 @@ where
     }
 }
 
-impl<Wp, T> Div<T> for Oklab<Wp, T>
+impl<T> Div<T> for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
 {
     type Output = Self;
@@ -555,9 +499,8 @@ where
     }
 }
 
-impl<Wp, T> DivAssign for Oklab<Wp, T>
+impl<T> DivAssign for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent + DivAssign,
 {
     fn div_assign(&mut self, other: Self) {
@@ -567,9 +510,8 @@ where
     }
 }
 
-impl<Wp, T> DivAssign<T> for Oklab<Wp, T>
+impl<T> DivAssign<T> for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent + DivAssign,
 {
     fn div_assign(&mut self, c: T) {
@@ -579,9 +521,8 @@ where
     }
 }
 
-impl<Wp, T, P> AsRef<P> for Oklab<Wp, T>
+impl<T, P> AsRef<P> for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
     P: RawPixel<T> + ?Sized,
 {
@@ -590,9 +531,8 @@ where
     }
 }
 
-impl<Wp, T, P> AsMut<P> for Oklab<Wp, T>
+impl<T, P> AsMut<P> for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
     P: RawPixel<T> + ?Sized,
 {
@@ -601,9 +541,8 @@ where
     }
 }
 
-impl<Wp, T> RelativeContrast for Oklab<Wp, T>
+impl<T> RelativeContrast for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
 {
     type Scalar = T;
@@ -619,17 +558,14 @@ where
 }
 
 #[cfg(feature = "random")]
-impl<Wp, T> Distribution<Oklab<Wp, T>> for Standard
+impl<T> Distribution<Oklab<T>> for Standard
 where
-    Wp: WhitePoint,
     T: FloatComponent,
     Standard: Distribution<T>,
 {
     // `a` and `b` both range from (-1.0, 1.0)
-    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Oklab<Wp, T>
-    where
-        Wp: WhitePoint,
-    {
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Oklab<T>
+where {
         Oklab::new(
             rng.gen(),
             rng.gen() * from_f64(2.0) - from_f64(1.0),
@@ -639,9 +575,8 @@ where
 }
 
 #[cfg(feature = "random")]
-pub struct UniformOklab<Wp, T>
+pub struct UniformOklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent + SampleUniform,
 {
     l: Uniform<T>,
@@ -651,21 +586,19 @@ where
 }
 
 #[cfg(feature = "random")]
-impl<Wp, T> SampleUniform for Oklab<Wp, T>
+impl<T> SampleUniform for Oklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent + SampleUniform,
 {
-    type Sampler = UniformOklab<Wp, T>;
+    type Sampler = UniformOklab<T>;
 }
 
 #[cfg(feature = "random")]
-impl<Wp, T> UniformSampler for UniformOklab<Wp, T>
+impl<T> UniformSampler for UniformOklab<T>
 where
-    Wp: WhitePoint,
     T: FloatComponent + SampleUniform,
 {
-    type X = Oklab<Wp, T>;
+    type X = Oklab<T>;
 
     fn new<B1, B2>(low_b: B1, high_b: B2) -> Self
     where
@@ -699,10 +632,8 @@ where
         }
     }
 
-    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Oklab<Wp, T>
-    where
-        Wp: WhitePoint,
-    {
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Oklab<T>
+where {
         Oklab::new(self.l.sample(rng), self.a.sample(rng), self.b.sample(rng))
     }
 }

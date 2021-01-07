@@ -267,12 +267,11 @@ where
     }
 }
 
-impl<Wp, T> FromColorUnclamped<Oklab<Wp, T>> for Xyz<Wp, T>
+impl<T> FromColorUnclamped<Oklab<T>> for Xyz<D65, T>
 where
-    Wp: WhitePoint,
     T: FloatComponent,
 {
-    fn from_color_unclamped(color: Oklab<Wp, T>) -> Self {
+    fn from_color_unclamped(color: Oklab<T>) -> Self {
         let m1_inv = oklab::m1_inv();
         let m2_inv = oklab::m2_inv();
 
@@ -281,11 +280,10 @@ where
             y: m_,
             z: s_,
             ..
-        } = multiply_xyz::<_, Wp, _>(&m2_inv, &Xyz::new(color.l, color.a, color.b));
+        } = multiply_xyz(&m2_inv, &Xyz::new(color.l, color.a, color.b));
 
         let lms = Xyz::new(l_.powi(3), m_.powi(3), s_.powi(3));
-
-        let Xyz { x, y, z, .. } = multiply_xyz::<_, Wp, _>(&m1_inv, &lms);
+        let Xyz { x, y, z, .. } = multiply_xyz(&m1_inv, &lms);
 
         Self::with_wp(x, y, z)
     }

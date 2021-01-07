@@ -1,3 +1,4 @@
+use approx::{AbsDiffEq, RelativeEq, UlpsEq};
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
 #[cfg(feature = "random")]
@@ -94,6 +95,56 @@ where
 {
     fn clone(&self) -> Oklab<T> {
         *self
+    }
+}
+
+impl<T> AbsDiffEq for Oklab<T>
+where
+    T: FloatComponent + AbsDiffEq,
+    T::Epsilon: Copy + FloatComponent,
+{
+    type Epsilon = T::Epsilon;
+
+    fn default_epsilon() -> Self::Epsilon {
+        T::default_epsilon()
+    }
+
+    fn abs_diff_eq(&self, other: &Self, epsilon: T::Epsilon) -> bool {
+        self.l.abs_diff_eq(&other.l, epsilon)
+            && self.a.abs_diff_eq(&other.a, epsilon)
+            && self.b.abs_diff_eq(&other.b, epsilon)
+    }
+}
+
+impl<T> RelativeEq for Oklab<T>
+where
+    T: FloatComponent + RelativeEq,
+    T::Epsilon: Copy + FloatComponent,
+{
+    fn default_max_relative() -> T::Epsilon {
+        T::default_max_relative()
+    }
+
+    fn relative_eq(&self, other: &Self, epsilon: T::Epsilon, max_relative: T::Epsilon) -> bool {
+        self.l.relative_eq(&other.l, epsilon, max_relative)
+            && self.a.relative_eq(&other.a, epsilon, max_relative)
+            && self.b.relative_eq(&other.b, epsilon, max_relative)
+    }
+}
+
+impl<T> UlpsEq for Oklab<T>
+where
+    T: FloatComponent + UlpsEq,
+    T::Epsilon: Copy + FloatComponent,
+{
+    fn default_max_ulps() -> u32 {
+        T::default_max_ulps()
+    }
+
+    fn ulps_eq(&self, other: &Self, epsilon: T::Epsilon, max_ulps: u32) -> bool {
+        self.l.ulps_eq(&other.l, epsilon, max_ulps)
+            && self.a.ulps_eq(&other.a, epsilon, max_ulps)
+            && self.b.ulps_eq(&other.b, epsilon, max_ulps)
     }
 }
 

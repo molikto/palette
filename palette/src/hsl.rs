@@ -59,7 +59,7 @@ pub type Hsla<S = Srgb, T = f32> = Alpha<Hsl<S, T>, T>;
 ///
 /// See [HSV](crate::Hsv) for a very similar color space, with brightness
 /// instead of lightness.
-#[derive(Debug, ArrayCast, FromColorUnclamped, WithAlpha)]
+#[derive(ArrayCast, FromColorUnclamped, WithAlpha)]
 #[cfg_attr(feature = "serializing", derive(Serialize, Deserialize))]
 #[palette(
     palette_internal,

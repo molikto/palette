@@ -50,7 +50,7 @@ pub type Rgba<S = Srgb, T = f32> = Alpha<Rgb<S, T>, T>;
 /// linear, meaning that gamma correction is required when converting to and
 /// from a displayable RGB, such as sRGB. See the [`encoding`](crate::encoding)
 /// module for encoding formats.
-#[derive(Debug, ArrayCast, FromColorUnclamped, WithAlpha)]
+#[derive(ArrayCast, FromColorUnclamped, WithAlpha)]
 #[cfg_attr(feature = "serializing", derive(Serialize, Deserialize))]
 #[palette(
     palette_internal,
@@ -943,6 +943,7 @@ where
 }
 
 /// Error type for parsing a string of hexadecimal characters to an `Rgb` color.
+#[cfg(feature = "std")]
 #[derive(Debug)]
 pub enum FromHexError {
     /// An error occurred while parsing the string into a valid integer.
@@ -951,17 +952,20 @@ pub enum FromHexError {
     HexFormatError(&'static str),
 }
 
+#[cfg(feature = "std")]
 impl From<ParseIntError> for FromHexError {
     fn from(err: ParseIntError) -> FromHexError {
         FromHexError::ParseIntError(err)
     }
 }
 
+#[cfg(feature = "std")]
 impl From<&'static str> for FromHexError {
     fn from(err: &'static str) -> FromHexError {
         FromHexError::HexFormatError(err)
     }
 }
+#[cfg(feature = "std")]
 impl core::fmt::Display for FromHexError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match &*self {
@@ -985,6 +989,7 @@ impl std::error::Error for FromHexError {
     }
 }
 
+#[cfg(feature = "std")]
 impl<S> FromStr for Rgb<S, u8> {
     type Err = FromHexError;
 

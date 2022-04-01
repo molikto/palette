@@ -5,7 +5,7 @@ use crate::{cast::ComponentOrder, rgb};
 /// RGBA color packed in ABGR order.
 ///
 /// See [Packed](crate::cast::Packed) for more details.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct Abgr;
 
 impl<S, T> ComponentOrder<rgb::Rgba<S, T>, [T; 4]> for Abgr {
@@ -25,7 +25,7 @@ impl<S, T> ComponentOrder<rgb::Rgba<S, T>, [T; 4]> for Abgr {
 /// RGBA color packed in ARGB order.
 ///
 /// See [Packed](crate::cast::Packed) for more details.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct Argb;
 
 impl<S, T> ComponentOrder<rgb::Rgba<S, T>, [T; 4]> for Argb {
@@ -45,7 +45,7 @@ impl<S, T> ComponentOrder<rgb::Rgba<S, T>, [T; 4]> for Argb {
 /// RGBA color packed in BGRA order.
 ///
 /// See [Packed](crate::cast::Packed) for more details.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct Bgra;
 
 impl<S, T> ComponentOrder<rgb::Rgba<S, T>, [T; 4]> for Bgra {
@@ -65,7 +65,7 @@ impl<S, T> ComponentOrder<rgb::Rgba<S, T>, [T; 4]> for Bgra {
 /// RGBA color packed in RGBA order.
 ///
 /// See [Packed](crate::cast::Packed) for more details.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct Rgba;
 
 impl<S, T> ComponentOrder<rgb::Rgba<S, T>, [T; 4]> for Rgba {

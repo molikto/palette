@@ -88,7 +88,7 @@
 //! use palette::{Srgb, Xyz, IntoColor};
 //!
 //! /// A custom version of Xyz that stores integer values from 0 to 100.
-//! #[derive(PartialEq, Debug, FromColorUnclamped)]
+//! #[derive(PartialEq, FromColorUnclamped)]
 //! struct Xyz100 {
 //!     x: u8,
 //!     y: u8,
@@ -223,7 +223,7 @@
 //!     skip_derives(Rgb),
 //!     rgb_standard = "palette::encoding::Srgb"
 //! )]
-//! #[derive(PartialEq, Debug, FromColorUnclamped, WithAlpha)]
+//! #[derive(PartialEq, FromColorUnclamped, WithAlpha)]
 //! struct CssRgb {
 //!     red: u8,
 //!     green: u8,

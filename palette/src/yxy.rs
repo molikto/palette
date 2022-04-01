@@ -36,7 +36,7 @@ pub type Yxya<Wp = D65, T = f32> = Alpha<Yxy<Wp, T>, T>;
 /// for the color spaces are a plot of this color space's x and y coordinates.
 ///
 /// Conversions and operations on this color space depend on the white point.
-#[derive(Debug, ArrayCast, FromColorUnclamped, WithAlpha)]
+#[derive(ArrayCast, FromColorUnclamped, WithAlpha)]
 #[cfg_attr(feature = "serializing", derive(Serialize, Deserialize))]
 #[palette(
     palette_internal,

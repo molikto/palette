@@ -56,7 +56,7 @@ pub type Hsva<S = Srgb, T = f32> = Alpha<Hsv<S, T>, T>;
 ///
 /// assert_relative_eq!(hsv_f32, Hsv::new(180.0, 1.0 / 3.0, 0.2));
 /// ```
-#[derive(Debug, ArrayCast, FromColorUnclamped, WithAlpha)]
+#[derive(ArrayCast, FromColorUnclamped, WithAlpha)]
 #[cfg_attr(feature = "serializing", derive(Serialize, Deserialize))]
 #[palette(
     palette_internal,

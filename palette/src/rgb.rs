@@ -67,7 +67,9 @@ use crate::{
     Yxy,
 };
 
-pub use self::rgb::{FromHexError, Rgb, Rgba};
+pub use self::rgb::{Rgb, Rgba};
+#[cfg(feature = "std")]
+pub use self::rgb::FromHexError;
 
 pub mod channels;
 mod rgb;

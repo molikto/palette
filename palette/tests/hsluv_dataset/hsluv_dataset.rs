@@ -10,7 +10,7 @@ use palette::white_point::D65;
 use palette::{Hsluv, Lchuv, Luv, LuvHue, Xyz};
 use std::collections::HashMap;
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 struct HsluvExample {
     lchuv: Lchuv<D65, f64>,
     hsluv: Hsluv<D65, f64>,

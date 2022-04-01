@@ -29,7 +29,7 @@ struct Cie2000Raw {
     delta_e: f64,
 }
 
-#[derive(Copy, Clone, PartialEq, Debug)]
+#[derive(Copy, Clone, PartialEq)]
 struct Cie2000 {
     c1: Lab<D65, f64>,
     c2: Lab<D65, f64>,

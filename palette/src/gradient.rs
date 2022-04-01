@@ -34,7 +34,7 @@ where
 /// number of evenly spaced points using the `take` method. Any point outside
 /// the domain of the gradient will have the same color as the closest control
 /// point.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct Gradient<C, T = Vec<(<C as Mix>::Scalar, C)>>(T, PhantomData<C>)
 where
     C: Mix;
@@ -276,7 +276,6 @@ where
 }
 
 /// A slice of a Gradient that limits its domain.
-#[derive(Debug)]
 pub struct Slice<'a, C, T = Vec<(<C as Mix>::Scalar, C)>>
 where
     C: Mix + 'a,
@@ -372,7 +371,7 @@ where
 }
 
 /// A domain range for gradient slices.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub struct Range<T> {
     from: Option<T>,
     to: Option<T>,

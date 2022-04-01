@@ -21,7 +21,7 @@ use crate::{
 ///
 /// The gamma value is stored as a simple type that represents an `f32`
 /// constant.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct Gamma<S, N: Number = F2p2>(PhantomData<(S, N)>);
 
 impl<T, Sp, N> RgbStandard<T> for Gamma<Sp, N>
@@ -48,7 +48,7 @@ where
 ///
 /// The gamma value is stored as a simple type that represents an `f32`
 /// constant.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct GammaFn<N: Number = F2p2>(PhantomData<N>);
 
 impl<T, N> TransferFn<T> for GammaFn<N>
@@ -74,7 +74,7 @@ pub trait Number: 'static {
 }
 
 /// Represents `2.2f64`.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct F2p2;
 
 impl Number for F2p2 {

@@ -25,7 +25,7 @@ use crate::{
 };
 
 /// An alpha component wrapper for colors.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "serializing", derive(Serialize, Deserialize))]
 #[repr(C)]
 pub struct Alpha<C, T> {

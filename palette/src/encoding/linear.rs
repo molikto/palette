@@ -8,7 +8,7 @@ use crate::rgb::{RgbSpace, RgbStandard};
 use crate::white_point::WhitePoint;
 
 /// A generic standard with linear components.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct Linear<S>(PhantomData<S>);
 
 impl<T, Sp> RgbStandard<T> for Linear<Sp>
@@ -28,7 +28,7 @@ where
 }
 
 /// Linear color component encoding.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct LinearFn;
 
 impl<T> TransferFn<T> for LinearFn {

@@ -16,7 +16,7 @@ use palette::{Lab, Xyz, Yxy};
 use super::load_data::{load_color_checker, ColorCheckerRaw};
 use super::MAX_ERROR;
 
-#[derive(Copy, Clone, PartialEq, Debug)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct ColorCheckerData {
     yxy: Yxy<D50, f64>,
     xyz: Xyz<D50, f64>,

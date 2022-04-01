@@ -20,7 +20,7 @@ use palette::convert::IntoColorUnclamped;
 use palette::white_point::{Any, WhitePoint};
 use palette::{Lab, Lch, Xyz};
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct PointerWP;
 impl WhitePoint<f64> for PointerWP {
     fn get_xyz() -> Xyz<Any, f64> {
@@ -41,7 +41,7 @@ struct PointerDataRaw {
     luv_v: f64,
 }
 
-#[derive(Copy, Clone, PartialEq, Debug)]
+#[derive(Copy, Clone, PartialEq)]
 struct PointerData {
     lch: Lch<PointerWP, f64>,
     lab: Lab<PointerWP, f64>,

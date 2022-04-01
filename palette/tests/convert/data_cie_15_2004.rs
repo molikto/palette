@@ -24,7 +24,7 @@ struct Cie2004Raw {
     yxy_luma: f32,
 }
 
-#[derive(Copy, Clone, PartialEq, Debug)]
+#[derive(Copy, Clone, PartialEq)]
 struct Cie2004 {
     xyz: Xyz<D65, f32>,
     yxy: Yxy<D65, f32>,

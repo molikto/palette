@@ -13,7 +13,7 @@ use crate::{num::Real, Xyz};
 /// Some color spaces (such as `Xyz` and `Yxy`) or operations don't necessarily
 /// need a known intended white point. `Any` may be used as a placeholder type
 /// in those situations.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct Any;
 
 /// WhitePoint defines the Xyz color co-ordinates for a given white point.
@@ -37,7 +37,7 @@ pub trait WhitePoint<T>: 'static {
 /// tungsten-filament lighting. Its relative spectral power distribution is that
 /// of a Planckian radiator at a temperature of approximately 2856 K. Uses the
 /// CIE 1932 2° Standard Observer
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct A;
 impl<T: Real> WhitePoint<T> for A {
     #[inline]
@@ -49,7 +49,7 @@ impl<T: Real> WhitePoint<T> for A {
 ///
 /// CIE standard illuminant B represents noon sunlight, with a correlated color
 /// temperature (CCT) of 4874 K Uses the CIE 1932 2° Standard Observer
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct B;
 impl<T: Real> WhitePoint<T> for B {
     #[inline]
@@ -61,7 +61,7 @@ impl<T: Real> WhitePoint<T> for B {
 ///
 /// CIE standard illuminant C represents the average day light with a CCT of
 /// 6774 K Uses the CIE 1932 2° Standard Observer
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct C;
 impl<T: Real> WhitePoint<T> for C {
     #[inline]
@@ -73,7 +73,7 @@ impl<T: Real> WhitePoint<T> for C {
 ///
 /// D50 White Point is the natural daylight with a color temperature of around
 /// 5000K for 2° Standard Observer.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct D50;
 impl<T: Real> WhitePoint<T> for D50 {
     #[inline]
@@ -85,7 +85,7 @@ impl<T: Real> WhitePoint<T> for D50 {
 ///
 /// D55 White Point is the natural daylight with a color temperature of around
 /// 5500K for 2° Standard Observer.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct D55;
 impl<T: Real> WhitePoint<T> for D55 {
     #[inline]
@@ -97,7 +97,7 @@ impl<T: Real> WhitePoint<T> for D55 {
 ///
 /// D65 White Point is the natural daylight with a color temperature of 6500K
 /// for 2° Standard Observer.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct D65;
 impl<T: Real> WhitePoint<T> for D65 {
     #[inline]
@@ -109,7 +109,7 @@ impl<T: Real> WhitePoint<T> for D65 {
 ///
 /// D75 White Point is the natural daylight with a color temperature of around
 /// 7500K for 2° Standard Observer.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct D75;
 impl<T: Real> WhitePoint<T> for D75 {
     #[inline]
@@ -121,7 +121,7 @@ impl<T: Real> WhitePoint<T> for D75 {
 ///
 /// CIE standard illuminant E represents the equal energy radiator
 /// Uses the CIE 1932 2° Standard Observer
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct E;
 impl<T: Real> WhitePoint<T> for E {
     #[inline]
@@ -132,7 +132,7 @@ impl<T: Real> WhitePoint<T> for E {
 /// CIE fluorescent illuminant series - F2
 ///
 /// F2 represents a semi-broadband fluorescent lamp for 2° Standard Observer.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct F2;
 impl<T: Real> WhitePoint<T> for F2 {
     #[inline]
@@ -143,7 +143,7 @@ impl<T: Real> WhitePoint<T> for F2 {
 /// CIE fluorescent illuminant series - F7
 ///
 /// F7 represents a broadband fluorescent lamp for 2° Standard Observer.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct F7;
 impl<T: Real> WhitePoint<T> for F7 {
     #[inline]
@@ -154,7 +154,7 @@ impl<T: Real> WhitePoint<T> for F7 {
 /// CIE fluorescent illuminant series - F11
 ///
 /// F11 represents a narrowband fluorescent lamp for 2° Standard Observer.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct F11;
 impl<T: Real> WhitePoint<T> for F11 {
     #[inline]
@@ -166,7 +166,7 @@ impl<T: Real> WhitePoint<T> for F11 {
 ///
 /// D50 White Point is the natural daylight with a color temperature of around
 /// 5000K for 10° Standard Observer.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct D50Degree10;
 impl<T: Real> WhitePoint<T> for D50Degree10 {
     #[inline]
@@ -178,7 +178,7 @@ impl<T: Real> WhitePoint<T> for D50Degree10 {
 ///
 /// D55 White Point is the natural daylight with a color temperature of around
 /// 5500K for 10° Standard Observer.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct D55Degree10;
 impl<T: Real> WhitePoint<T> for D55Degree10 {
     #[inline]
@@ -190,7 +190,7 @@ impl<T: Real> WhitePoint<T> for D55Degree10 {
 ///
 /// D65 White Point is the natural daylight with a color temperature of 6500K
 /// for 10° Standard Observer.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct D65Degree10;
 impl<T: Real> WhitePoint<T> for D65Degree10 {
     #[inline]
@@ -202,7 +202,7 @@ impl<T: Real> WhitePoint<T> for D65Degree10 {
 ///
 /// D75 White Point is the natural daylight with a color temperature of around
 /// 7500K for 10° Standard Observer.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct D75Degree10;
 impl<T: Real> WhitePoint<T> for D75Degree10 {
     #[inline]

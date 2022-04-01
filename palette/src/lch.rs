@@ -36,7 +36,7 @@ pub type Lcha<Wp = D65, T = f32> = Alpha<Lch<Wp, T>, T>;
 /// it's a cylindrical color space, like [HSL](crate::Hsl) and
 /// [HSV](crate::Hsv). This gives it the same ability to directly change
 /// the hue and colorfulness of a color, while preserving other visual aspects.
-#[derive(Debug, ArrayCast, FromColorUnclamped, WithAlpha)]
+#[derive(ArrayCast, FromColorUnclamped, WithAlpha)]
 #[cfg_attr(feature = "serializing", derive(Serialize, Deserialize))]
 #[palette(
     palette_internal,

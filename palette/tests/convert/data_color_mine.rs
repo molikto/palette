@@ -67,7 +67,7 @@ pub struct ColorMineRaw<F = f64> {
     pub lch_h_normalized: F,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct ColorMine<F> {
     pub xyz: Xyz<D65, F>,
     pub yxy: Yxy<D65, F>,

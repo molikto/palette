@@ -34,7 +34,7 @@ use super::Premultiply;
 /// Note that converting to and from premultiplied alpha will cause the alpha
 /// component to be clamped to [0.0, 1.0], and fully transparent colors will
 /// become black.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "serializing", derive(Serialize, Deserialize))]
 #[repr(C)]
 pub struct PreAlpha<C: Premultiply> {

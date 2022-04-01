@@ -185,14 +185,14 @@ pub fn find_nearest_color<'a>(color: &'a str, skip: &HashSet<String>) -> Result<
     }
 }
 
-#[derive(PartialEq, Eq, Clone, Copy, Debug)]
+#[derive(PartialEq, Eq, Clone, Copy)]
 pub enum WhitePointSource {
     WhitePoint,
     RgbStandard,
     LumaStandard,
 }
 
-#[derive(Debug, Default)]
+#[derive(Default)]
 pub struct UsedInput {
     pub white_point: bool,
 }

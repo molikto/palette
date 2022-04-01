@@ -60,7 +60,7 @@ use super::ArrayCast;
 /// When an `Rgb` type is packed, the alpha value will be `0xFF` in the
 /// corresponding `u32`. Converting from a packed color type back to an `Rgb`
 /// type will disregard the alpha value.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(PartialEq, Eq)]
 #[repr(transparent)]
 pub struct Packed<O, P> {
     /// The color packed into a type `P`, such as `u32` or `[u8; 4]`.

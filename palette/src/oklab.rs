@@ -69,7 +69,7 @@ pub type Oklaba<T = f32> = Alpha<Oklab<T>, T>;
 /// Oklab is a perceptually-uniform color space similar in structure to
 /// [L\*a\*b\*](crate::Lab), but tries to have a better perceptual uniformity.
 /// It assumes a D65 whitepoint and normal well-lit viewing conditions.
-#[derive(Debug, ArrayCast, FromColorUnclamped, WithAlpha)]
+#[derive(ArrayCast, FromColorUnclamped, WithAlpha)]
 #[cfg_attr(feature = "serializing", derive(Serialize, Deserialize))]
 #[palette(
     palette_internal,

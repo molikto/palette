@@ -31,7 +31,7 @@ macro_rules! make_hues {
         /// number (like `f32`). This makes many calculations easier, but may
         /// also have some surprising effects if it's expected to act as a
         /// linear number.
-        #[derive(Clone, Copy, Debug, Default)]
+        #[derive(Clone, Copy, Default)]
         #[cfg_attr(feature = "serializing", derive(Serialize, Deserialize))]
         #[repr(C)]
         pub struct $name<T = f32>(T);

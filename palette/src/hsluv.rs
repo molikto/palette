@@ -42,7 +42,7 @@ pub type Hsluva<Wp = D65, T = f32> = Alpha<Hsluv<Wp, T>, T>;
 /// 100.0]. This makes HSLuv much more convenient for generating
 /// colors than Lchuv, as the set of valid saturation values is
 /// independent of lightness and hue.
-#[derive(Debug, ArrayCast, FromColorUnclamped, WithAlpha)]
+#[derive(ArrayCast, FromColorUnclamped, WithAlpha)]
 #[cfg_attr(feature = "serializing", derive(Serialize, Deserialize))]
 #[palette(
     palette_internal,

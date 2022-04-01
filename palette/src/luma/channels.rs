@@ -5,7 +5,7 @@ use crate::{cast::ComponentOrder, luma};
 /// Luma+Alpha color packed in LA order.
 ///
 /// See [Packed](crate::cast::Packed) for more details.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct La;
 
 impl<S, T> ComponentOrder<luma::Lumaa<S, T>, [T; 2]> for La {
@@ -23,7 +23,7 @@ impl<S, T> ComponentOrder<luma::Lumaa<S, T>, [T; 2]> for La {
 /// Luma+Alpha color packed in AL order.
 ///
 /// See [Packed](crate::cast::Packed) for more details.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct Al;
 
 impl<S, T> ComponentOrder<luma::Lumaa<S, T>, [T; 2]> for Al {

@@ -38,7 +38,7 @@ pub type Oklcha<T = f32> = Alpha<Oklch<T>, T>;
 ///
 /// It assumes a D65 whitepoint and normal well-lit viewing conditions,
 /// like Oklab.
-#[derive(Debug, ArrayCast, FromColorUnclamped, WithAlpha)]
+#[derive(ArrayCast, FromColorUnclamped, WithAlpha)]
 #[cfg_attr(feature = "serializing", derive(Serialize, Deserialize))]
 #[palette(
     palette_internal,

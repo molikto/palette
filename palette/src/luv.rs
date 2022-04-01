@@ -39,7 +39,7 @@ pub type Luva<Wp = D65, T = f32> = Alpha<Luv<Wp, T>, T>;
 /// CIELUV-space.
 ///
 /// As a result, CIELUV is used more frequently for additive settings.
-#[derive(Debug, ArrayCast, FromColorUnclamped, WithAlpha)]
+#[derive(ArrayCast, FromColorUnclamped, WithAlpha)]
 #[cfg_attr(feature = "serializing", derive(Serialize, Deserialize))]
 #[palette(
     palette_internal,

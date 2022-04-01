@@ -10,7 +10,7 @@ use crate::{
 };
 
 /// The sRGB color space.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct Srgb;
 
 impl<T: Real> Primaries<T> for Srgb {

@@ -14,7 +14,7 @@ use super::{zip_colors, Premultiply};
 /// blend function has can be written as `e(sp * S, dp * D)`. `e` is the
 /// equation (like `s + d`), `sp` and `dp` are the source and destination
 /// parameters, and `S` and `D` are the source and destination colors.
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct Equations {
     /// The equation for the color components.
     pub color_equation: Equation,
@@ -142,7 +142,7 @@ where
 }
 
 /// A blending equation.
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Equation {
     /// Add the source and destination, according to `sp * S + dp * D`.
     Add,
@@ -167,7 +167,7 @@ pub enum Equation {
 }
 
 /// A pair of source and destination parameters.
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct Parameters {
     /// The source parameter.
     pub source: Parameter,
@@ -177,7 +177,7 @@ pub struct Parameters {
 }
 
 /// A blending parameter.
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Parameter {
     /// A simple 1.
     One,
